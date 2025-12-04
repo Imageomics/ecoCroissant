@@ -1,0 +1,98 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "eco": "http://imageomics.org/ecoCroissant/",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dct": "http://purl.org/dc/terms/",
+    
+    "taxon": "eco:taxon",
+    "taxonRank": "eco:taxonRank",
+    "scientificName": "eco:scientificName",
+    "taxonID": "eco:taxonID",
+    "higherClassification": "eco:higherClassification",
+    "vernacularName": "eco:vernacularName",
+    "taxonomicStatus": "eco:taxonomicStatus",
+    
+    "locality": "eco:locality",
+    "habitat": "eco:habitat",
+    "biome": "eco:biome",
+    "continent": "eco:continent",
+    "coordinateUncertaintyInMeters": "eco:coordinateUncertaintyInMeters",
+    "minimumElevationInMeters": "eco:minimumElevationInMeters",
+    "maximumElevationInMeters": "eco:maximumElevationInMeters",
+    "minimumDepthInMeters": "eco:minimumDepthInMeters",
+    "maximumDepthInMeters": "eco:maximumDepthInMeters",
+    
+    "eventDate": "eco:eventDate",
+    "eventDateStart": "eco:eventDateStart",
+    "eventDateEnd": "eco:eventDateEnd",
+    "seasonality": "eco:seasonality",
+    "lifeStage": "eco:lifeStage",
+    
+    "trophicLevel": "eco:trophicLevel",
+    "ecologicalRole": "eco:ecologicalRole",
+    "speciesInteractions": "eco:speciesInteractions",
+    "diet": "eco:diet",
+    "hostOrganism": "eco:hostOrganism",
+    
+    "iucnStatus": "eco:iucnStatus",
+    "iucnStatusSource": "eco:iucnStatusSource",
+    "populationTrend": "eco:populationTrend",
+    "threats": "eco:threats",
+    "conservationActions": "eco:conservationActions",
+    "protectedArea": "eco:protectedArea",
+    
+    "identificationVerificationStatus": "eco:identificationVerificationStatus",
+    "identifiedBy": "eco:identifiedBy",
+    "samplingProtocol": "eco:samplingProtocol",
+    "dataGeneralizations": "eco:dataGeneralizations",
+    "informationWithheld": "eco:informationWithheld",
+    "basisOfRecord": "eco:basisOfRecord",
+    
+    "imageLicense": "eco:imageLicense",
+    "imageType": "eco:imageType",
+    "viewAngle": "eco:viewAngle",
+    "anatomicalFeatures": "eco:anatomicalFeatures",
+    "phenotype": "eco:phenotype",
+    
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  }
+}
