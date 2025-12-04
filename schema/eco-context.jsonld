@@ -20,6 +20,7 @@
     "habitat": "eco:habitat",
     "biome": "eco:biome",
     "continent": "eco:continent",
+    "country": "eco:country",
     "coordinateUncertaintyInMeters": "eco:coordinateUncertaintyInMeters",
     "minimumElevationInMeters": "eco:minimumElevationInMeters",
     "maximumElevationInMeters": "eco:maximumElevationInMeters",
