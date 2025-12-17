@@ -8,17 +8,33 @@ Version 1.0
 
 ## Introduction
 
-ecoCroissant is an extension to the [Croissant format](http://mlcommons.org/croissant/1.0) designed to capture ecologically-relevant information from biodiversity datasets. It follows [FAIR4AI principles](https://www.nature.com/articles/s41597-022-01759-2) to ensure datasets are Findable, Accessible, Interoperable, and Reusable for AI/ML applications in ecological and biodiversity research.
+ecoCroissant is an extension to the [Croissant format](http://mlcommons.org/croissant/1.0) designed to make biodiversity datasets **AI-ready** by integrating Darwin Core terms with FAIR4AI-specific requirements. Rather than redefining existing biodiversity standards, ecoCroissant builds upon [Darwin Core](https://dwc.tdwg.org/) terms and enhances them with AI-specific metadata needed for machine learning applications.
 
-Biodiversity datasets contain unique characteristics that are not adequately captured by the base Croissant format, including:
+### FAIR4AI Requirements
 
-- **Taxonomic information**: Species identification, taxonomic hierarchy, and nomenclature
-- **Geographic and temporal context**: Collection locations, habitats, and temporal coverage
-- **Ecological relationships**: Trophic levels, species interactions, and ecological roles
-- **Collection methodology**: Observation methods, specimen handling, and data quality indicators
-- **Conservation context**: IUCN status, protected areas, and population data
+ecoCroissant specifically addresses FAIR4AI requirements:
 
-The ecoCroissant extension addresses these needs by providing a standardized vocabulary for documenting ecological and biodiversity metadata in ML-ready datasets.
+1. **Queryable Metadata**: Data and metadata can be queried without downloading large files or specialized file types
+2. **Ontology Integration**: Darwin Core terms are directly integrated, queryable with synonyms from other biodiversity ontologies (GBIF, NCBI, EOL)
+3. **Content/Context Extraction**: Clear distinction between occurrence-based and image-based data records
+
+### AI-Ready Data Requirements
+
+ecoCroissant ensures datasets are **AI-ready** by including:
+
+- **Distribution Information**: Data splits, stratification details, and class distributions in usable form
+- **Preprocessing Documentation**: Information about whether data has been processed or standardized and how
+- **Model Provenance**: For AI-generated annotations or classifications
+- **Rate Limiting**: Server profiling information for streaming data from sources
+
+### Extension Scope
+
+ecoCroissant extends Croissant by:
+
+- **Direct Darwin Core Integration**: Using Darwin Core terms natively rather than redefining them
+- **AI-Specific Metadata**: Adding properties for model provenance, data splits, and preprocessing pipelines
+- **Ecological Context**: Properties for ecological relationships and conservation status not in Darwin Core
+- **Image-Specific Metadata**: Properties for anatomical features, view angles, and image types relevant to biodiversity ML
 
 ## Prerequisites
 
@@ -111,57 +127,114 @@ Ensuring data reliability for ML applications:
 - **Georeferencing quality**: GPS accuracy, geocoding method
 - **Temporal precision**: Exact date vs. date range
 
-## ecoCroissant Properties
+## Properties
 
-### Taxonomic Properties
+ecoCroissant uses Darwin Core terms directly where applicable and adds new properties only when needed for AI-specific requirements or ecological concepts not covered by Darwin Core.
 
+### Darwin Core Properties (Used Directly)
+
+The following Darwin Core terms are used directly without redefinition:
+
+#### Taxonomic Terms
 | Property | Expected Type | Cardinality | Description |
 |----------|---------------|-------------|-------------|
-| eco:taxon | sc:Taxon or sc:Text | MANY | The taxonomic name(s) of organisms in the dataset |
-| eco:taxonRank | sc:Text | ONE | The taxonomic rank (e.g., species, genus, family) |
-| eco:scientificName | sc:Text | ONE | The full scientific name including authorship |
-| eco:taxonID | sc:URL | MANY | Identifier(s) from taxonomic databases (GBIF, NCBI, etc.) |
-| eco:higherClassification | sc:Text | ONE | Full taxonomic hierarchy (Kingdom > Phylum > Class > Order > Family > Genus > Species) |
-| eco:vernacularName | sc:Text | MANY | Common name(s) in various languages |
-| eco:taxonomicStatus | sc:Text | ONE | Status of the taxon name (accepted, synonym, etc.) |
+| dwc:scientificName | sc:Text | ONE | The full scientific name including authorship |
+| dwc:taxonRank | sc:Text | ONE | The taxonomic rank (e.g., species, genus, family) |
+| dwc:kingdom | sc:Text | ONE | Taxonomic kingdom |
+| dwc:phylum | sc:Text | ONE | Taxonomic phylum |
+| dwc:class | sc:Text | ONE | Taxonomic class |
+| dwc:order | sc:Text | ONE | Taxonomic order |
+| dwc:family | sc:Text | ONE | Taxonomic family |
+| dwc:genus | sc:Text | ONE | Taxonomic genus |
+| dwc:higherClassification | sc:Text | ONE | Full taxonomic hierarchy |
+| dwc:vernacularName | sc:Text | MANY | Common name(s) in various languages |
+| dwc:taxonomicStatus | sc:Text | ONE | Status of the taxon name (accepted, synonym, etc.) |
+| dwc:taxonID | sc:URL | MANY | Identifier from taxonomic databases (GBIF, NCBI, etc.) |
 
-### Geographic Properties
-
+#### Geographic Terms
 | Property | Expected Type | Cardinality | Description |
 |----------|---------------|-------------|-------------|
-| eco:locality | sc:Text | ONE | Description of the location |
-| eco:habitat | sc:Text | MANY | Habitat type(s) where organisms occur |
+| dwc:locality | sc:Text | ONE | Description of the location |
+| dwc:habitat | sc:Text | MANY | Habitat type(s) where organisms occur |
+| dwc:continent | sc:Text | ONE | Continent of occurrence |
+| dwc:country | sc:Text | MANY | Country/countries of occurrence |
+| dwc:coordinateUncertaintyInMeters | sc:Number | ONE | Uncertainty radius for coordinates |
+| dwc:minimumElevationInMeters | sc:Number | ONE | Minimum elevation of occurrences |
+| dwc:maximumElevationInMeters | sc:Number | ONE | Maximum elevation of occurrences |
+| dwc:minimumDepthInMeters | sc:Number | ONE | Minimum depth (for aquatic organisms) |
+| dwc:maximumDepthInMeters | sc:Number | ONE | Maximum depth (for aquatic organisms) |
+| dwc:decimalLatitude | sc:Float | ONE | Latitude in decimal degrees |
+| dwc:decimalLongitude | sc:Float | ONE | Longitude in decimal degrees |
+| dwc:geodeticDatum | sc:Text | ONE | Spatial reference system (e.g., WGS84) |
+
+#### Temporal Terms
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| dwc:eventDate | sc:Date or sc:DateTime | MANY | Date(s) when data was collected |
+| dwc:year | sc:Integer | ONE | Year of collection |
+| dwc:month | sc:Integer | ONE | Month of collection |
+| dwc:day | sc:Integer | ONE | Day of collection |
+| dwc:lifeStage | sc:Text | MANY | Life stage(s) represented (egg, larva, adult, etc.) |
+
+#### Data Quality Terms
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| dwc:identificationVerificationStatus | sc:Text | ONE | Verification level of taxonomic identifications |
+| dwc:identifiedBy | sc:Text | MANY | Who identified the specimens/observations |
+| dwc:samplingProtocol | sc:Text | ONE | Method used to collect data |
+| dwc:dataGeneralizations | sc:Text | ONE | Any data generalizations applied (e.g., coordinate obscuring) |
+| dwc:informationWithheld | sc:Text | ONE | Information intentionally withheld (e.g., for endangered species) |
+| dwc:basisOfRecord | sc:Text | ONE | Type of record (PreservedSpecimen, HumanObservation, MachineObservation, etc.) |
+| dwc:occurrenceStatus | sc:Text | ONE | Whether organism was present or absent |
+
+### AI-Specific Properties (ecoCroissant Extensions)
+
+These properties are ecoCroissant additions for AI-ready data requirements:
+
+#### Data Distribution and Preprocessing
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| eco:dataDistribution | sc:Text | ONE | Description of class distribution (e.g., "long-tailed", "balanced", stratification details) |
+| eco:preprocessingSteps | sc:Text | MANY | List of preprocessing steps applied (e.g., "resized to 224x224", "normalized to [-1,1]") |
+| eco:standardizationMethod | sc:Text | ONE | Method used for data standardization if applicable |
+| eco:trainTestSplit | sc:Text | ONE | Description of train/test/validation splits with proportions |
+| eco:stratificationVariable | sc:Text | MANY | Variables used for stratification (e.g., "taxonomic family", "geographic region") |
+| eco:dataSplitRationale | sc:Text | ONE | Rationale for data splitting strategy |
+
+#### Model Provenance for AI-Generated Data
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| eco:generatedBy | sc:Text | ONE | Name/version of model that generated annotations or classifications |
+| eco:modelConfidence | sc:Float | ONE | Confidence score for AI-generated labels (0-1) |
+| eco:humanVerified | sc:Boolean | ONE | Whether AI-generated data has been human-verified |
+| eco:generationMethod | sc:Text | ONE | Method used for generation (e.g., "automated classification", "bounding box detection") |
+
+#### API and Streaming Information
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| eco:apiEndpoint | sc:URL | ONE | API endpoint for streaming data access |
+| eco:rateLimitRequests | sc:Integer | ONE | Maximum requests per time period |
+| eco:rateLimitPeriod | sc:Text | ONE | Time period for rate limit (e.g., "per minute", "per hour") |
+| eco:streamingSupported | sc:Boolean | ONE | Whether data can be streamed rather than downloaded |
+| eco:bulkDownloadSize | sc:Text | ONE | Approximate size of full dataset download |
+
+#### Record Type Context (FAIR4AI Requirement)
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| eco:recordType | sc:Text | ONE | Type of data record: "occurrence-based" or "image-based" or "mixed" |
+| eco:occurrenceToImageRatio | sc:Float | ONE | Ratio of occurrence records to images (relevant for mixed datasets) |
+| eco:imageAnnotationType | sc:Text | MANY | Type of image annotations (e.g., "bounding box", "segmentation", "whole image classification") |
+
+#### Ecological Extensions (Not in Darwin Core)
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
 | eco:biome | sc:Text | ONE | Major biome classification |
-| eco:continent | sc:Text | ONE | Continent of occurrence |
-| eco:country | sc:Text | MANY | Country/countries of occurrence |
-| eco:coordinateUncertaintyInMeters | sc:Number | ONE | Uncertainty radius for coordinates |
-| eco:minimumElevationInMeters | sc:Number | ONE | Minimum elevation of occurrences |
-| eco:maximumElevationInMeters | sc:Number | ONE | Maximum elevation of occurrences |
-| eco:minimumDepthInMeters | sc:Number | ONE | Minimum depth (for aquatic organisms) |
-| eco:maximumDepthInMeters | sc:Number | ONE | Maximum depth (for aquatic organisms) |
-
-### Temporal Properties
-
-| Property | Expected Type | Cardinality | Description |
-|----------|---------------|-------------|-------------|
-| eco:eventDate | sc:Date or sc:DateTime | MANY | Date(s) when data was collected |
-| eco:eventDateStart | sc:Date | ONE | Start of collection period |
-| eco:eventDateEnd | sc:Date | ONE | End of collection period |
-| eco:seasonality | sc:Text | MANY | Seasonal patterns in the data |
-| eco:lifeStage | sc:Text | MANY | Life stage(s) represented (egg, larva, adult, etc.) |
-
-### Ecological Properties
-
-| Property | Expected Type | Cardinality | Description |
-|----------|---------------|-------------|-------------|
 | eco:trophicLevel | sc:Text | ONE | Position in food chain (producer, primary consumer, etc.) |
 | eco:ecologicalRole | sc:Text | MANY | Ecological function (pollinator, predator, decomposer, etc.) |
 | eco:speciesInteractions | sc:Text | MANY | Description of species interactions in the dataset |
 | eco:diet | sc:Text | MANY | Diet composition for animals |
-| eco:hostOrganism | sc:Text | MANY | Host species (for parasites, symbionts) |
 
-### Conservation Properties
-
+#### Conservation Extensions
 | Property | Expected Type | Cardinality | Description |
 |----------|---------------|-------------|-------------|
 | eco:iucnStatus | sc:Text | ONE | IUCN Red List category (LC, NT, VU, EN, CR, EW, EX) |
@@ -171,19 +244,7 @@ Ensuring data reliability for ML applications:
 | eco:conservationActions | sc:Text | MANY | Conservation actions in place or recommended |
 | eco:protectedArea | sc:Text | MANY | Protected areas where species occurs |
 
-### Data Quality Properties
-
-| Property | Expected Type | Cardinality | Description |
-|----------|---------------|-------------|-------------|
-| eco:identificationVerificationStatus | sc:Text | ONE | Verification level of taxonomic identifications |
-| eco:identifiedBy | sc:Text | MANY | Who identified the specimens/observations |
-| eco:samplingProtocol | sc:Text | ONE | Method used to collect data |
-| eco:dataGeneralizations | sc:Text | ONE | Any data generalizations applied (e.g., coordinate obscuring) |
-| eco:informationWithheld | sc:Text | ONE | Information intentionally withheld (e.g., for endangered species) |
-| eco:basisOfRecord | sc:Text | ONE | Type of record (PreservedSpecimen, HumanObservation, MachineObservation, etc.) |
-
-### Image and Observation Properties
-
+#### Image-Specific Extensions
 | Property | Expected Type | Cardinality | Description |
 |----------|---------------|-------------|-------------|
 | eco:imageLicense | sc:URL | ONE | License for images in the dataset |
@@ -191,10 +252,12 @@ Ensuring data reliability for ML applications:
 | eco:viewAngle | sc:Text | MANY | View angle of specimens in images (dorsal, ventral, lateral, etc.) |
 | eco:anatomicalFeatures | sc:Text | MANY | Anatomical features visible or annotated |
 | eco:phenotype | sc:Text | MANY | Observable phenotypic characteristics |
+| eco:imageResolution | sc:Text | ONE | Resolution of images (e.g., "1024x1024", "variable") |
+| eco:imageFormat | sc:Text | MANY | Image file formats (e.g., "JPEG", "PNG", "TIFF") |
 
 ## JSON-LD Context
 
-The recommended JSON-LD context for ecoCroissant:
+The recommended JSON-LD context for ecoCroissant uses Darwin Core terms directly:
 
 ```json
 {
@@ -207,35 +270,73 @@ The recommended JSON-LD context for ecoCroissant:
     "dwc": "http://rs.tdwg.org/dwc/terms/",
     "dct": "http://purl.org/dc/terms/",
     
-    "taxon": "eco:taxon",
-    "taxonRank": "eco:taxonRank",
-    "scientificName": "eco:scientificName",
-    "taxonID": "eco:taxonID",
-    "higherClassification": "eco:higherClassification",
-    "vernacularName": "eco:vernacularName",
-    "taxonomicStatus": "eco:taxonomicStatus",
+    "scientificName": "dwc:scientificName",
+    "taxonRank": "dwc:taxonRank",
+    "kingdom": "dwc:kingdom",
+    "phylum": "dwc:phylum",
+    "class": "dwc:class",
+    "order": "dwc:order",
+    "family": "dwc:family",
+    "genus": "dwc:genus",
+    "taxonID": "dwc:taxonID",
+    "higherClassification": "dwc:higherClassification",
+    "vernacularName": "dwc:vernacularName",
+    "taxonomicStatus": "dwc:taxonomicStatus",
     
-    "locality": "eco:locality",
-    "habitat": "eco:habitat",
+    "locality": "dwc:locality",
+    "habitat": "dwc:habitat",
+    "continent": "dwc:continent",
+    "country": "dwc:country",
+    "decimalLatitude": "dwc:decimalLatitude",
+    "decimalLongitude": "dwc:decimalLongitude",
+    "coordinateUncertaintyInMeters": "dwc:coordinateUncertaintyInMeters",
+    "minimumElevationInMeters": "dwc:minimumElevationInMeters",
+    "maximumElevationInMeters": "dwc:maximumElevationInMeters",
+    "minimumDepthInMeters": "dwc:minimumDepthInMeters",
+    "maximumDepthInMeters": "dwc:maximumDepthInMeters",
+    "geodeticDatum": "dwc:geodeticDatum",
+    
+    "eventDate": "dwc:eventDate",
+    "year": "dwc:year",
+    "month": "dwc:month",
+    "day": "dwc:day",
+    "lifeStage": "dwc:lifeStage",
+    
+    "identificationVerificationStatus": "dwc:identificationVerificationStatus",
+    "identifiedBy": "dwc:identifiedBy",
+    "samplingProtocol": "dwc:samplingProtocol",
+    "dataGeneralizations": "dwc:dataGeneralizations",
+    "informationWithheld": "dwc:informationWithheld",
+    "basisOfRecord": "dwc:basisOfRecord",
+    "occurrenceStatus": "dwc:occurrenceStatus",
+    
+    "dataDistribution": "eco:dataDistribution",
+    "preprocessingSteps": "eco:preprocessingSteps",
+    "standardizationMethod": "eco:standardizationMethod",
+    "trainTestSplit": "eco:trainTestSplit",
+    "stratificationVariable": "eco:stratificationVariable",
+    "dataSplitRationale": "eco:dataSplitRationale",
+    
+    "generatedBy": "eco:generatedBy",
+    "modelConfidence": "eco:modelConfidence",
+    "humanVerified": "eco:humanVerified",
+    "generationMethod": "eco:generationMethod",
+    
+    "apiEndpoint": "eco:apiEndpoint",
+    "rateLimitRequests": "eco:rateLimitRequests",
+    "rateLimitPeriod": "eco:rateLimitPeriod",
+    "streamingSupported": "eco:streamingSupported",
+    "bulkDownloadSize": "eco:bulkDownloadSize",
+    
+    "recordType": "eco:recordType",
+    "occurrenceToImageRatio": "eco:occurrenceToImageRatio",
+    "imageAnnotationType": "eco:imageAnnotationType",
+    
     "biome": "eco:biome",
-    "continent": "eco:continent",
-    "coordinateUncertaintyInMeters": "eco:coordinateUncertaintyInMeters",
-    "minimumElevationInMeters": "eco:minimumElevationInMeters",
-    "maximumElevationInMeters": "eco:maximumElevationInMeters",
-    "minimumDepthInMeters": "eco:minimumDepthInMeters",
-    "maximumDepthInMeters": "eco:maximumDepthInMeters",
-    
-    "eventDate": "eco:eventDate",
-    "eventDateStart": "eco:eventDateStart",
-    "eventDateEnd": "eco:eventDateEnd",
-    "seasonality": "eco:seasonality",
-    "lifeStage": "eco:lifeStage",
-    
     "trophicLevel": "eco:trophicLevel",
     "ecologicalRole": "eco:ecologicalRole",
     "speciesInteractions": "eco:speciesInteractions",
     "diet": "eco:diet",
-    "hostOrganism": "eco:hostOrganism",
     
     "iucnStatus": "eco:iucnStatus",
     "iucnStatusSource": "eco:iucnStatusSource",
@@ -244,25 +345,57 @@ The recommended JSON-LD context for ecoCroissant:
     "conservationActions": "eco:conservationActions",
     "protectedArea": "eco:protectedArea",
     
-    "identificationVerificationStatus": "eco:identificationVerificationStatus",
-    "identifiedBy": "eco:identifiedBy",
-    "samplingProtocol": "eco:samplingProtocol",
-    "dataGeneralizations": "eco:dataGeneralizations",
-    "informationWithheld": "eco:informationWithheld",
-    "basisOfRecord": "eco:basisOfRecord",
-    
     "imageLicense": "eco:imageLicense",
     "imageType": "eco:imageType",
     "viewAngle": "eco:viewAngle",
     "anatomicalFeatures": "eco:anatomicalFeatures",
-    "phenotype": "eco:phenotype"
+    "phenotype": "eco:phenotype",
+    "imageResolution": "eco:imageResolution",
+    "imageFormat": "eco:imageFormat",
+    
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
   }
 }
 ```
 
 ## Examples
 
-### Example 1: Species Image Dataset (TreeOfLife-200M style)
+### Example 1: AI-Ready Species Image Dataset (TreeOfLife-200M style)
 
 ```json
 {
@@ -271,11 +404,12 @@ The recommended JSON-LD context for ecoCroissant:
     "@vocab": "https://schema.org/",
     "cr": "http://mlcommons.org/croissant/",
     "eco": "http://imageomics.org/ecoCroissant/",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
     "dct": "http://purl.org/dc/terms/"
   },
   "@type": "sc:Dataset",
   "name": "TreeOfLife-200M",
-  "description": "A large-scale dataset of 200 million images spanning the tree of life, designed for training species identification models.",
+  "description": "AI-ready dataset of 200M images spanning the tree of life with stratified splits for species identification. Images from iNaturalist Research Grade observations.",
   "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
   "url": "https://huggingface.co/datasets/imageomics/TreeOfLife-200M",
   "dct:conformsTo": [
@@ -283,25 +417,38 @@ The recommended JSON-LD context for ecoCroissant:
     "http://imageomics.org/ecoCroissant/1.0"
   ],
   
-  "eco:taxon": ["Animalia", "Plantae", "Fungi"],
-  "eco:taxonRank": "kingdom",
-  "eco:higherClassification": "Life > Eukaryota > Multiple Kingdoms",
+  "dwc:basisOfRecord": ["HumanObservation"],
+  "dwc:identificationVerificationStatus": "Research Grade (2/3+ community agreement)",
+  "dwc:samplingProtocol": "Community science observations via iNaturalist platform",
+  "dwc:dataGeneralizations": "Coordinates obscured for sensitive species per observer privacy settings",
   
-  "eco:habitat": ["terrestrial", "freshwater", "marine"],
-  "eco:continent": ["Africa", "Antarctica", "Asia", "Europe", "North America", "Oceania", "South America"],
+  "eco:recordType": "image-based",
+  "eco:dataDistribution": "long-tailed: 500K species with 1-10,000 images each, stratified by taxonomic family",
+  "eco:preprocessingSteps": ["resized to 224x224", "normalized to ImageNet stats", "augmented with random crops and flips"],
+  "eco:standardizationMethod": "ImageNet normalization (mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])",
+  "eco:trainTestSplit": "80% train, 10% validation, 10% test - stratified by species",
+  "eco:stratificationVariable": ["dwc:family", "dwc:genus"],
+  "eco:dataSplitRationale": "Stratified to ensure representation across taxonomic groups; temporal split avoided due to seasonal biases",
   
-  "eco:basisOfRecord": ["HumanObservation", "PreservedSpecimen", "MachineObservation"],
-  "eco:imageType": ["photograph", "museum specimen"],
-  "eco:identificationVerificationStatus": "mixed - includes expert-verified and community-validated observations",
+  "eco:apiEndpoint": "https://huggingface.co/api/datasets/imageomics/TreeOfLife-200M",
+  "eco:streamingSupported": true,
+  "eco:bulkDownloadSize": "~15TB uncompressed",
+  "eco:rateLimitRequests": 1000,
+  "eco:rateLimitPeriod": "per hour",
   
-  "eco:samplingProtocol": "Images collected from multiple sources including iNaturalist, museum collections, and research projects",
+  "eco:imageType": ["photograph"],
+  "eco:imageResolution": "variable - minimum 224x224, maximum 4096x4096",
+  "eco:imageFormat": ["JPEG"],
+  "eco:imageLicense": "https://creativecommons.org/licenses/by-nc/4.0/",
   
   "distribution": [
     {
       "@type": "cr:FileObject",
-      "@id": "images.tar.gz",
-      "contentUrl": "https://huggingface.co/datasets/imageomics/TreeOfLife-200M/resolve/main/images.tar.gz",
-      "encodingFormat": "application/gzip"
+      "@id": "metadata.parquet",
+      "name": "metadata.parquet",
+      "description": "Queryable metadata without downloading images",
+      "contentUrl": "https://huggingface.co/datasets/imageomics/TreeOfLife-200M/resolve/main/metadata.parquet",
+      "encodingFormat": "application/x-parquet"
     }
   ],
   
@@ -312,25 +459,35 @@ The recommended JSON-LD context for ecoCroissant:
       "field": [
         {
           "@type": "cr:Field",
-          "@id": "species_images/image",
-          "dataType": "sc:ImageObject"
-        },
-        {
-          "@type": "cr:Field",
-          "@id": "species_images/scientific_name",
-          "description": "Scientific name of the species",
+          "@id": "species_images/image_id",
           "dataType": "sc:Text"
         },
         {
           "@type": "cr:Field",
-          "@id": "species_images/taxon_id",
-          "description": "GBIF taxon identifier",
-          "dataType": "sc:URL"
+          "@id": "species_images/scientificName",
+          "description": "Darwin Core scientific name",
+          "dataType": "dwc:scientificName"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "species_images/taxonID",
+          "description": "iNaturalist taxon identifier linking to GBIF",
+          "dataType": "dwc:taxonID"
         },
         {
           "@type": "cr:Field",
           "@id": "species_images/kingdom",
-          "description": "Taxonomic kingdom",
+          "dataType": "dwc:kingdom"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "species_images/family",
+          "dataType": "dwc:family"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "species_images/split",
+          "description": "train/val/test split assignment",
           "dataType": "sc:Text"
         }
       ]
@@ -339,7 +496,7 @@ The recommended JSON-LD context for ecoCroissant:
 }
 ```
 
-### Example 2: Butterfly Specimen Dataset
+### Example 2: Butterfly Specimen Dataset with AI-Generated Annotations
 
 ```json
 {
@@ -348,50 +505,64 @@ The recommended JSON-LD context for ecoCroissant:
     "@vocab": "https://schema.org/",
     "cr": "http://mlcommons.org/croissant/",
     "eco": "http://imageomics.org/ecoCroissant/",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
     "dct": "http://purl.org/dc/terms/"
   },
   "@type": "sc:Dataset",
   "name": "Heliconius Butterfly Wing Pattern Dataset",
-  "description": "High-resolution images of Heliconius butterfly specimens with wing pattern annotations for studying mimicry and adaptation.",
+  "description": "AI-ready dataset of museum specimens with standardized imaging and AI-assisted wing pattern segmentations.",
   "license": "https://creativecommons.org/licenses/by/4.0/",
   "dct:conformsTo": [
     "http://mlcommons.org/croissant/1.0",
     "http://imageomics.org/ecoCroissant/1.0"
   ],
   
-  "eco:taxon": "Heliconius",
-  "eco:taxonRank": "genus",
-  "eco:scientificName": "Heliconius Kluk, 1780",
-  "eco:taxonID": ["https://www.gbif.org/species/1932585"],
-  "eco:higherClassification": "Animalia > Arthropoda > Insecta > Lepidoptera > Nymphalidae > Heliconiinae > Heliconius",
-  "eco:vernacularName": ["Longwing butterflies", "Heliconius butterflies"],
+  "dwc:scientificName": "Heliconius Kluk, 1780",
+  "dwc:taxonRank": "genus",
+  "dwc:taxonID": "https://www.gbif.org/species/1932585",
+  "dwc:higherClassification": "Animalia > Arthropoda > Insecta > Lepidoptera > Nymphalidae > Heliconiinae > Heliconius",
+  "dwc:vernacularName": ["Longwing butterflies"],
+  "dwc:kingdom": "Animalia",
+  "dwc:class": "Insecta",
+  "dwc:order": "Lepidoptera",
+  "dwc:family": "Nymphalidae",
+  "dwc:genus": "Heliconius",
   
-  "eco:habitat": ["tropical rainforest", "forest edge", "secondary forest"],
+  "dwc:habitat": ["tropical rainforest", "forest edge", "secondary forest"],
+  "dwc:continent": ["South America", "Central America"],
+  "dwc:country": ["Ecuador", "Peru", "Colombia", "Panama", "Costa Rica"],
+  "dwc:minimumElevationInMeters": 0,
+  "dwc:maximumElevationInMeters": 2000,
+  
+  "dwc:lifeStage": ["adult"],
+  "dwc:basisOfRecord": "PreservedSpecimen",
+  "dwc:identificationVerificationStatus": "expert-verified",
+  "dwc:identifiedBy": ["Museum taxonomists", "Heliconius specialists"],
+  "dwc:samplingProtocol": "Museum specimens imaged with standardized dorsal and ventral views at 300 DPI",
+  
   "eco:biome": "tropical moist broadleaf forest",
-  "eco:continent": ["South America", "Central America"],
-  "eco:country": ["Ecuador", "Peru", "Colombia", "Panama", "Costa Rica"],
-  "eco:minimumElevationInMeters": 0,
-  "eco:maximumElevationInMeters": 2000,
-  
-  "eco:lifeStage": ["adult"],
   "eco:trophicLevel": "primary consumer",
   "eco:ecologicalRole": ["pollinator", "Müllerian mimic"],
   "eco:diet": ["pollen", "nectar"],
-  "eco:hostOrganism": ["Passiflora (host plant for larvae)"],
-  "eco:speciesInteractions": "Müllerian mimicry complex with other Heliconius species; larvae feed exclusively on Passiflora plants",
+  "eco:speciesInteractions": "Müllerian mimicry complex; larvae on Passiflora",
   
   "eco:iucnStatus": "LC",
   "eco:populationTrend": "stable",
   
-  "eco:basisOfRecord": "PreservedSpecimen",
-  "eco:identificationVerificationStatus": "expert-verified",
-  "eco:identifiedBy": ["Museum taxonomists", "Heliconius specialists"],
-  "eco:samplingProtocol": "Museum specimens imaged with standardized dorsal and ventral views",
-  
+  "eco:recordType": "image-based",
+  "eco:preprocessingSteps": ["white background removal", "standardized to 1024x1024", "color-corrected"],
   "eco:imageType": ["museum specimen photograph"],
+  "eco:imageResolution": "1024x1024",
+  "eco:imageFormat": ["TIFF", "JPEG"],
   "eco:viewAngle": ["dorsal", "ventral"],
   "eco:anatomicalFeatures": ["forewing", "hindwing", "wing pattern"],
-  "eco:phenotype": "wing color pattern"
+  "eco:phenotype": "wing color pattern",
+  "eco:imageAnnotationType": ["segmentation"],
+  
+  "eco:generatedBy": "Mask R-CNN v2.1 trained on 5K hand-annotated specimens",
+  "eco:modelConfidence": 0.92,
+  "eco:humanVerified": true,
+  "eco:generationMethod": "automated wing boundary segmentation with manual correction"
 }
 ```
 
@@ -446,26 +617,29 @@ The recommended JSON-LD context for ecoCroissant:
 }
 ```
 
-## Alignment with Darwin Core
+## Darwin Core Integration
 
-ecoCroissant properties are designed to be compatible with [Darwin Core](https://dwc.tdwg.org/) terms where applicable. The following table shows the mapping:
+ecoCroissant uses Darwin Core terms directly as part of its vocabulary. There is no separate "ecoCroissant version" of Darwin Core terms - the standard Darwin Core terms are used natively through the `dwc:` namespace.
 
-| ecoCroissant Property | Darwin Core Term |
-|----------------------|------------------|
-| eco:taxon | dwc:scientificName |
-| eco:taxonRank | dwc:taxonRank |
-| eco:higherClassification | dwc:higherClassification |
-| eco:vernacularName | dwc:vernacularName |
-| eco:locality | dwc:locality |
-| eco:habitat | dwc:habitat |
-| eco:continent | dwc:continent |
-| eco:country | dwc:country |
-| eco:coordinateUncertaintyInMeters | dwc:coordinateUncertaintyInMeters |
-| eco:eventDate | dwc:eventDate |
-| eco:lifeStage | dwc:lifeStage |
-| eco:basisOfRecord | dwc:basisOfRecord |
-| eco:identifiedBy | dwc:identifiedBy |
-| eco:samplingProtocol | dwc:samplingProtocol |
+### Direct Darwin Core Usage
+
+All Darwin Core terms are available for use in ecoCroissant datasets. The most commonly used terms include:
+
+- **Taxonomic**: `dwc:scientificName`, `dwc:taxonRank`, `dwc:kingdom`, `dwc:phylum`, `dwc:class`, `dwc:order`, `dwc:family`, `dwc:genus`, `dwc:higherClassification`, `dwc:taxonID`, `dwc:vernacularName`, `dwc:taxonomicStatus`
+- **Geographic**: `dwc:locality`, `dwc:habitat`, `dwc:continent`, `dwc:country`, `dwc:decimalLatitude`, `dwc:decimalLongitude`, `dwc:coordinateUncertaintyInMeters`, `dwc:geodeticDatum`, elevation and depth terms
+- **Temporal**: `dwc:eventDate`, `dwc:year`, `dwc:month`, `dwc:day`
+- **Data Quality**: `dwc:basisOfRecord`, `dwc:identifiedBy`, `dwc:identificationVerificationStatus`, `dwc:samplingProtocol`, `dwc:dataGeneralizations`, `dwc:informationWithheld`
+
+### Queryability with Ontology Synonyms
+
+Darwin Core terms in ecoCroissant datasets can be queried using synonyms from other biodiversity ontologies:
+
+- **GBIF Backbone Taxonomy**: `dwc:taxonID` can link to GBIF species pages
+- **NCBI Taxonomy**: Cross-reference via taxon identifiers
+- **Encyclopedia of Life (EOL)**: Link species concepts across systems
+- **Integrated Taxonomic Information System (ITIS)**: Standard taxonomic references
+
+This satisfies the FAIR4AI requirement that "ontology used can be queried with synonyms from other ontologies."
 
 ## Integration with FAIR4AI Principles
 

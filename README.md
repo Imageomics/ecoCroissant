@@ -7,24 +7,31 @@
 
 ## Overview
 
-ecoCroissant is an extension to the [Croissant format](https://github.com/mlcommons/croissant) designed to capture ecologically-relevant information from biodiversity datasets. It follows [FAIR4AI principles](https://www.nature.com/articles/s41597-022-01759-2) to ensure datasets are Findable, Accessible, Interoperable, and Reusable for AI/ML applications in ecological and biodiversity research.
+ecoCroissant makes biodiversity datasets **AI-ready** by integrating [Darwin Core](https://dwc.tdwg.org/) terms with [FAIR4AI](https://www.nature.com/articles/s41597-022-01759-2) requirements. Rather than redefining existing standards, ecoCroissant uses Darwin Core terms directly and adds AI-specific metadata for machine learning applications.
 
-## Why ecoCroissant?
+### FAIR4AI Requirements
 
-The standard Croissant format provides excellent support for ML-ready datasets, but biodiversity datasets have unique characteristics that require additional metadata:
+ecoCroissant addresses the three key FAIR4AI requirements:
 
-- **Taxonomic Information**: Species identification, taxonomic hierarchies, and nomenclature
-- **Geographic Context**: Collection locations, habitats, elevation, and protected areas  
-- **Temporal Ecology**: Phenology, seasonality, and collection timelines
-- **Ecological Relationships**: Trophic levels, species interactions, and ecological roles
-- **Conservation Status**: IUCN categories, population trends, and threats
-- **Data Quality**: Identification confidence, georeferencing accuracy, and sampling methods
+1. **Queryable Metadata**: Data/metadata can be queried without downloading large files (via Parquet/queryable formats)
+2. **Ontology Integration**: Darwin Core terms are queryable with synonyms from GBIF, NCBI, EOL
+3. **Content/Context Extraction**: Clear distinction between occurrence-based and image-based records
+
+### AI-Ready Features
+
+ecoCroissant ensures datasets are AI-ready by documenting:
+
+- **Data Distribution**: Class distributions, long-tail characteristics, stratification details
+- **Preprocessing Pipeline**: Standardization methods, augmentation, normalization
+- **Train/Val/Test Splits**: Rationale, stratification variables, split proportions
+- **Model Provenance**: For AI-generated annotations or labels
+- **Streaming Support**: API endpoints and rate limits for scalable data access
 
 ## Quick Start
 
-### Using ecoCroissant Properties
+### Using Darwin Core with AI-Ready Metadata
 
-Add the ecoCroissant context to your Croissant metadata:
+ecoCroissant uses Darwin Core terms directly, adding AI-specific properties:
 
 ```json
 {
@@ -33,6 +40,7 @@ Add the ecoCroissant context to your Croissant metadata:
     "@vocab": "https://schema.org/",
     "cr": "http://mlcommons.org/croissant/",
     "eco": "http://imageomics.org/ecoCroissant/",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
     "dct": "http://purl.org/dc/terms/"
   },
   "@type": "sc:Dataset",
@@ -42,11 +50,15 @@ Add the ecoCroissant context to your Croissant metadata:
     "http://imageomics.org/ecoCroissant/1.0"
   ],
   
-  "eco:taxon": "Lepidoptera",
-  "eco:taxonRank": "order",
-  "eco:habitat": ["tropical rainforest", "temperate forest"],
-  "eco:iucnStatus": "LC",
-  "eco:basisOfRecord": "PreservedSpecimen"
+  "dwc:scientificName": "Lepidoptera",
+  "dwc:taxonRank": "order",
+  "dwc:habitat": ["tropical rainforest", "temperate forest"],
+  "dwc:basisOfRecord": "PreservedSpecimen",
+  
+  "eco:recordType": "image-based",
+  "eco:dataDistribution": "long-tailed: 5K species, 10-1000 images each",
+  "eco:trainTestSplit": "80/10/10 stratified by family",
+  "eco:preprocessingSteps": ["resized to 224x224", "ImageNet normalization"]
 }
 ```
 
@@ -54,7 +66,7 @@ Add the ecoCroissant context to your Croissant metadata:
 
 See the [examples](examples/) directory for complete examples:
 
-- [TreeOfLife-200M](examples/treeoflife-200m.json) - Large-scale species image dataset
+- [TreeOfLife-200M](examples/treeoflife-200m.json) - AI-ready species image dataset with 200M images
 
 ## Documentation
 
@@ -63,38 +75,43 @@ See the [examples](examples/) directory for complete examples:
 
 ## Property Categories
 
-### Taxonomic Properties
-| Property | Description |
-|----------|-------------|
-| `eco:taxon` | Taxonomic name(s) of organisms |
-| `eco:taxonRank` | Taxonomic rank (species, genus, family, etc.) |
-| `eco:scientificName` | Full scientific name with authorship |
-| `eco:taxonID` | Links to GBIF, NCBI, or other databases |
-| `eco:higherClassification` | Full taxonomic hierarchy |
+### Darwin Core Terms (Used Directly)
 
-### Geographic Properties
-| Property | Description |
-|----------|-------------|
-| `eco:habitat` | Habitat type(s) |
-| `eco:biome` | Major biome classification |
-| `eco:locality` | Location description |
-| `eco:protectedArea` | Protected areas where species occurs |
+ecoCroissant uses Darwin Core terms without redefinition:
 
-### Conservation Properties
-| Property | Description |
-|----------|-------------|
-| `eco:iucnStatus` | IUCN Red List category |
-| `eco:populationTrend` | Population trend direction |
-| `eco:threats` | Known threats to species |
+#### Taxonomic
+`dwc:scientificName`, `dwc:taxonRank`, `dwc:kingdom`, `dwc:phylum`, `dwc:class`, `dwc:order`, `dwc:family`, `dwc:genus`, `dwc:taxonID`, `dwc:higherClassification`, `dwc:vernacularName`
 
-### Data Quality Properties
-| Property | Description |
-|----------|-------------|
-| `eco:basisOfRecord` | Type of record (specimen, observation, etc.) |
-| `eco:identificationVerificationStatus` | Verification level |
-| `eco:samplingProtocol` | Data collection method |
+#### Geographic
+`dwc:locality`, `dwc:habitat`, `dwc:continent`, `dwc:country`, `dwc:decimalLatitude`, `dwc:decimalLongitude`, `dwc:coordinateUncertaintyInMeters`, `dwc:minimumElevationInMeters`, `dwc:maximumElevationInMeters`
 
-See the [full specification](docs/eco-spec.md) for all available properties.
+#### Temporal
+`dwc:eventDate`, `dwc:year`, `dwc:month`, `dwc:day`, `dwc:lifeStage`
+
+#### Data Quality
+`dwc:basisOfRecord`, `dwc:identifiedBy`, `dwc:identificationVerificationStatus`, `dwc:samplingProtocol`, `dwc:dataGeneralizations`, `dwc:informationWithheld`
+
+### AI-Specific ecoCroissant Extensions
+
+#### Data Distribution & Preprocessing
+`eco:dataDistribution`, `eco:preprocessingSteps`, `eco:standardizationMethod`, `eco:trainTestSplit`, `eco:stratificationVariable`, `eco:dataSplitRationale`
+
+#### Model Provenance
+`eco:generatedBy`, `eco:modelConfidence`, `eco:humanVerified`, `eco:generationMethod`
+
+#### API & Streaming
+`eco:apiEndpoint`, `eco:rateLimitRequests`, `eco:rateLimitPeriod`, `eco:streamingSupported`, `eco:bulkDownloadSize`
+
+#### Record Type Context
+`eco:recordType`, `eco:occurrenceToImageRatio`, `eco:imageAnnotationType`
+
+#### Ecological Extensions
+`eco:biome`, `eco:trophicLevel`, `eco:ecologicalRole`, `eco:speciesInteractions`, `eco:diet`
+
+#### Conservation Extensions
+`eco:iucnStatus`, `eco:populationTrend`, `eco:threats`, `eco:protectedArea`
+
+See the [full specification](docs/eco-spec.md) for complete property definitions.
 
 ## Integration with Standards
 
