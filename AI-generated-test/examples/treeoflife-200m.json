@@ -1,0 +1,198 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "eco": "http://imageomics.org/ecoCroissant/",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dct": "http://purl.org/dc/terms/"
+  },
+  "@type": "sc:Dataset",
+  "name": "TreeOfLife-200M",
+  "description": "AI-ready dataset of 200M images from iNaturalist Research Grade observations spanning the tree of life. Includes stratified train/val/test splits, queryable metadata, and preprocessing documentation for species identification ML models.",
+  "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+  "url": "https://huggingface.co/datasets/imageomics/TreeOfLife-200M",
+  "creator": {
+    "@type": "Organization",
+    "name": "Imageomics Institute",
+    "url": "https://imageomics.org/"
+  },
+  "datePublished": "2024",
+  "keywords": [
+    "species identification",
+    "biodiversity",
+    "computer vision",
+    "iNaturalist",
+    "phylogeny",
+    "tree of life",
+    "image classification",
+    "AI-ready",
+    "FAIR4AI"
+  ],
+  "dct:conformsTo": [
+    "http://mlcommons.org/croissant/1.0",
+    "http://imageomics.org/ecoCroissant/1.0"
+  ],
+
+  "dwc:basisOfRecord": "HumanObservation",
+  "dwc:identificationVerificationStatus": "Research Grade (2/3+ community agreement)",
+  "dwc:samplingProtocol": "Community science observations via iNaturalist platform, 2008-2023",
+  "dwc:dataGeneralizations": "Coordinates obscured for sensitive/threatened species per observer privacy settings",
+  
+  "eco:recordType": "image-based",
+  "eco:dataDistribution": "Long-tailed distribution: ~500K species with 1-10,000 images per species. Top 1% of species account for 30% of images. Stratified by taxonomic family to ensure representation.",
+  "eco:preprocessingSteps": [
+    "Resized to 224x224 pixels (aspect ratio preserved, zero-padded)",
+    "Normalized using ImageNet statistics (mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])",
+    "Training augmentation: random horizontal flip, random crop, color jitter"
+  ],
+  "eco:standardizationMethod": "ImageNet normalization applied to all images for transfer learning compatibility",
+  "eco:trainTestSplit": "80% train (160M images), 10% validation (20M images), 10% test (20M images)",
+  "eco:stratificationVariable": ["dwc:family", "dwc:genus"],
+  "eco:dataSplitRationale": "Stratified by taxonomic family to ensure phylogenetic diversity across splits. Species with <10 images excluded from test set to avoid data leakage. Temporal split avoided due to seasonal observation biases.",
+  
+  "eco:apiEndpoint": "https://huggingface.co/api/datasets/imageomics/TreeOfLife-200M",
+  "eco:streamingSupported": true,
+  "eco:bulkDownloadSize": "~15TB uncompressed images + 5GB metadata",
+  "eco:rateLimitRequests": 1000,
+  "eco:rateLimitPeriod": "per hour",
+  
+  "eco:imageType": "photograph",
+  "eco:imageResolution": "Variable source resolution (224x224 to 4096x4096), standardized to 224x224 for ML",
+  "eco:imageFormat": "JPEG",
+  "eco:imageLicense": "CC-BY-NC 4.0 (individual images may have more permissive licenses)",
+  
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "metadata.parquet",
+      "name": "metadata.parquet",
+      "description": "Queryable metadata file with Darwin Core terms. Can be queried without downloading images. Includes taxonomy, geography, temporal info, and split assignments.",
+      "contentUrl": "https://huggingface.co/datasets/imageomics/TreeOfLife-200M/resolve/main/metadata.parquet",
+      "encodingFormat": "application/x-parquet",
+      "contentSize": "5GB"
+    },
+    {
+      "@type": "cr:FileSet",
+      "@id": "train-images",
+      "name": "train-images",
+      "description": "Training split images",
+      "contentUrl": "https://huggingface.co/datasets/imageomics/TreeOfLife-200M/resolve/main/images/train/",
+      "encodingFormat": "image/jpeg"
+    }
+  ],
+  
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "observations",
+      "name": "Species Observations",
+      "description": "Image-based species observations with Darwin Core metadata",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "observations/image_id",
+          "name": "image_id",
+          "description": "Unique identifier for the image",
+          "dataType": "sc:Text"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "observations/image_url",
+          "name": "image_url",
+          "description": "URL to the image file",
+          "dataType": "sc:URL"
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "observations/scientificName",
+          "name": "scientificName",
+          "description": "Darwin Core scientific name of the observed species",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {"@id": "metadata.parquet"},
+            "extract": {"column": "scientificName"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "observations/taxonID",
+          "name": "taxonID",
+          "description": "iNaturalist taxon identifier (links to GBIF)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {"@id": "metadata.parquet"},
+            "extract": {"column": "taxonID"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "observations/kingdom",
+          "name": "kingdom",
+          "description": "Taxonomic kingdom (Darwin Core)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {"@id": "metadata.parquet"},
+            "extract": {"column": "kingdom"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "observations/family",
+          "name": "family",
+          "description": "Taxonomic family (Darwin Core)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {"@id": "metadata.parquet"},
+            "extract": {"column": "family"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "observations/decimalLatitude",
+          "name": "decimalLatitude",
+          "description": "Latitude in decimal degrees (may be obscured for sensitive species)",
+          "dataType": "sc:Float",
+          "source": {
+            "fileObject": {"@id": "metadata.parquet"},
+            "extract": {"column": "decimalLatitude"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "observations/decimalLongitude",
+          "name": "decimalLongitude",
+          "description": "Longitude in decimal degrees (may be obscured for sensitive species)",
+          "dataType": "sc:Float",
+          "source": {
+            "fileObject": {"@id": "metadata.parquet"},
+            "extract": {"column": "decimalLongitude"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "observations/eventDate",
+          "name": "eventDate",
+          "description": "Date of observation (Darwin Core)",
+          "dataType": "sc:Date",
+          "source": {
+            "fileObject": {"@id": "metadata.parquet"},
+            "extract": {"column": "eventDate"}
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "observations/split",
+          "name": "split",
+          "description": "Data split assignment: train, val, or test",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {"@id": "metadata.parquet"},
+            "extract": {"column": "split"}
+          }
+        }
+      ]
+    }
+  ]
+}
